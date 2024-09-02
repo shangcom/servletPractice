@@ -1,6 +1,5 @@
 package hello.servletPractice.web.servlet;
 
-import hello.servletPractice.domain.member.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
