@@ -1,11 +1,8 @@
 package hello.servletPractice.web.frontcontroller.v3;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.servletPractice.web.frontcontroller.ModelView;
 import hello.servletPractice.web.frontcontroller.MyView;
-import hello.servletPractice.web.frontcontroller.v2.controller.MemberFormControllerV2;
-import hello.servletPractice.web.frontcontroller.v2.controller.MemberListControllerV2;
-import hello.servletPractice.web.frontcontroller.v2.controller.MemberSaveControllerV2;
+import hello.servletPractice.web.frontcontroller.v3.ControllerV3;
 import hello.servletPractice.web.frontcontroller.v3.controller.MemberFormControllerV3;
 import hello.servletPractice.web.frontcontroller.v3.controller.MemberListControllerV3;
 import hello.servletPractice.web.frontcontroller.v3.controller.MemberSaveControllerV3;
@@ -16,13 +13,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet(name = "frontControllerServletV3", urlPatterns = "/front-controller/v3/*")
 public class FrontControllerServletV3 extends HttpServlet {
-    private Map<String, ControllerV3> controllerMap = new HashMap<>();
+
+    Map<String, ControllerV3> controllerMap = new HashMap<>();
 
     public FrontControllerServletV3() {
         controllerMap.put("/front-controller/v3/members/new-form", new MemberFormControllerV3());
@@ -34,7 +31,6 @@ public class FrontControllerServletV3 extends HttpServlet {
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
-
         ControllerV3 controller = controllerMap.get(requestURI);
         if (controller == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -44,11 +40,12 @@ public class FrontControllerServletV3 extends HttpServlet {
         Map<String, String> paramMap = createParamMap(request);
 
         ModelView mv = controller.process(paramMap);
+        Map<String, Object> model = mv.getModel();
 
-        String viewName = mv.getViewName(); // 논리이름. ex)new-form
+        String viewName = mv.getViewName();
         MyView view = viewResolver(viewName);
 
-        view.render(mv.getModel(), request, response);
+        view.render(model, request, response);
 
     }
 
