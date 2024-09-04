@@ -29,11 +29,11 @@ public class FrontControllerServletV5 extends HttpServlet {
     private final List<MyHandlerAdapter> handlerAdapters = new ArrayList<>();
 
     public FrontControllerServletV5() {
-        initHandlerMapping();
+        initHandlearMappingMap();
         initHandlerAdapters();
     }
 
-    private void initHandlerMapping() {
+    private void initHandlearMappingMap() {
         handlerMappingMap.put("/front-controller/v5/v3/members/new-form", new MemberFormControllerV3());
         handlerMappingMap.put("/front-controller/v5/v3/members/save", new MemberSaveControllerV3());
         handlerMappingMap.put("/front-controller/v5/v3/members", new MemberListControllerV3());
@@ -51,7 +51,8 @@ public class FrontControllerServletV5 extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        Object handler = getHandler(request);
+        String requestURI = request.getRequestURI();
+        Object handler = handlerMappingMap.get(requestURI);
 
         if (handler == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -65,7 +66,10 @@ public class FrontControllerServletV5 extends HttpServlet {
         String viewName = mv.getViewName();
         MyView view = viewResolver(viewName);
 
-        view.render(mv.getModel(), request, response);
+        Map<String, Object> model = mv.getModel();
+
+        view.render(model, request, response);
+
 
     }
 
@@ -79,12 +83,6 @@ public class FrontControllerServletV5 extends HttpServlet {
                 return adapter;
             }
         }
-        throw new IllegalArgumentException("handler adapter not found: " + handler);
-    }
-
-    private Object getHandler(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        Object handler = handlerMappingMap.get(requestURI);
-        return handler;
+        throw new IllegalArgumentException("no adapter for this handler: " + handler);
     }
 }
